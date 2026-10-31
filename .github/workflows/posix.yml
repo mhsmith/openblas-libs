@@ -2,7 +2,6 @@ name: posix
 
 on:
   push:
-    branches: [ main ]
   pull_request:
     branches:
       - main
