@@ -5,8 +5,6 @@ BUILD_PREFIX=${BUILD_PREFIX:-/usr/local}
 
 ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 
-MB_PYTHON_VERSION=3.9
-
 source $(dirname "${BASH_SOURCE[0]}")/gfortran_compat.sh
 
 function before_build {
@@ -22,9 +20,6 @@ function before_build {
             sudo chmod 777 /usr/local/include
             touch /usr/local/include/.dir_exists
         fi
-        # get_macpython_environment ${MB_PYTHON_VERSION} venv
-        python3.9 -m venv venv
-        source venv/bin/activate
 
         unalias gfortran 2>/dev/null || true
         source tools/gfortran_utils.sh
@@ -55,7 +50,7 @@ function before_build {
         if [[ ! -x  objconv/objconv ]]; then
             (cd ${ROOT_DIR}/objconv && bash ../tools/build_objconv.sh)
         fi
-    elif [ "$MB_ML_LIBC" == *linux ]; then
+    elif [[ "$MB_ML_LIBC" == *linux ]]; then
         # Red Hat keeps static libraries in separate *-static subpackages, so
         # the images on a system gcc rather than a gcc-toolset (manylinux_2_39,
         # i.e. riscv64) have no libgfortran.a.  The archive is in the CRB repo,
@@ -131,7 +126,7 @@ function build_lib {
             local target="PRESCOTT"
             local dynamic_list="PRESCOTT NEHALEM SANDYBRIDGE HASWELL"
             ;;
-        *linux_aarch6 | android_arm64_v8a)
+        *linux_aarch64 | android_arm64_v8a)
             local bitness=64
             local target="ARMV8"
             ;;
@@ -219,13 +214,19 @@ function build_lib {
         echo "QEMU does not support the 'lper' /'lpdr' instructions used"
     fi
     if [ -n "$dynamic_list" ]; then
-        interface_flags+=" DYNAMIC_LIST=$dynamic_list"
+        CFLAGS="$CFLAGS -fvisibility=protected -Wno-uninitialized" \
+        make BUFFERSIZE=20 QUIET_MAKE=1 \
+            USE_OPENMP=0 NUM_THREADS=64 \
+            DYNAMIC_LIST="$dynamic_list" \
+            BINARY="$bitness" $interface_flags \
+            TARGET="$target"
+    else
+        CFLAGS="$CFLAGS -fvisibility=protected -Wno-uninitialized" \
+        make BUFFERSIZE=20 QUIET_MAKE=1 \
+            USE_OPENMP=0 NUM_THREADS=64 \
+            BINARY="$bitness" $interface_flags \
+            TARGET="$target"
     fi
-    CFLAGS="$CFLAGS -fvisibility=protected -Wno-uninitialized" \
-    make BUFFERSIZE=20 QUIET_MAKE=1 \
-        USE_OPENMP=0 NUM_THREADS=64 \
-        BINARY="$bitness" $interface_flags \
-        TARGET="$target"
     make PREFIX=$BUILD_PREFIX $interface_flags install
     popd
     mv $BUILD_PREFIX/lib/pkgconfig/openblas*.pc $BUILD_PREFIX/lib/pkgconfig/scipy-openblas.pc

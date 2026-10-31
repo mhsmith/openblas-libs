@@ -19,6 +19,7 @@ on:
 
 jobs:
   build:
+    name: ${{ matrix.MB_ML_LIBC }}_${{ matrix.PLAT}}, ${{ matrix.INTERFACE64 == '1' && '64' || '32' }}
     runs-on: ${{ matrix.os }}
     defaults:
       run:

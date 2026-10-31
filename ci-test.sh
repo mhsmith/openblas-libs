@@ -1,11 +1,9 @@
 #!/bin/bash
-# Test that the wheel works with a different python
 set -xe
 
-PYTHON=python3.9
+PYTHON=python3
 if [ "$CIBUILDWHEEL_BUILD_IDENTIFIER" = "macosx_x86_64" ]; then
-    which python3.9
-    PYTHON="arch -x86_64 python3.9"
+    PYTHON="arch -x86_64 python3"
 fi
 
 # Make sure the module works and that the version strings match
