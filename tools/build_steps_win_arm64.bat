@@ -224,7 +224,7 @@ REM Copy CMake configuration files
 echo Copying CMake configuration files...
 if exist openblasconfig.cmake copy /Y openblasconfig.cmake "%DEST_DIR%\lib\cmake\openblas\"
 if exist openblasconfigversion.cmake copy /Y openblasconfigversion.cmake "%DEST_DIR%\lib\cmake\openblas\"
-
+ 
 REM Copy header files
 echo Copying generated header files...
 if exist generated xcopy /E /Y generated "%DEST_DIR%\include\"
