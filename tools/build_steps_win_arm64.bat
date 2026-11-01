@@ -238,8 +238,13 @@ xcopy /Y "..\lapack-netlib\lapacke\include\*.h" "%DEST_DIR%\include\"
 if errorlevel 1 exit /b 1
 
 echo Create pkgconfig scipy-openblas.pc
+
+echo FIXME
+bash -c "find . -name *.pc | xargs ls -l"
+bash -c "find . -name *.pc | xargs cat"
+
 cd ../..
-bash tools\get_pkg_config.sh
+bash -e tools\get_pkg_config.sh
 if errorlevel 1 (
     echo could not construct scipy-openblas.pc
     exit /b 1
