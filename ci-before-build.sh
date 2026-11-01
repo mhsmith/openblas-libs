@@ -37,6 +37,8 @@ BUILD_PREFIX="$(pwd)/build/prefix/$libc_plat"
 rm -rf "$BUILD_PREFIX"
 mkdir -p "$BUILD_PREFIX"
 
+# On emulated architectures, RUNNER_ARCH makes manylinux-install-clang install a
+# compiler for the native architecture, which will be much faster.
 case "$PLAT" in
     loongarch64|ppc64le|s390x|riscv64)
         manylinux-install-clang -v 21.1.6.0

@@ -47,6 +47,10 @@ test-command = "cd {package} && bash ci-test.sh"
 environment-pass = [
   "NIGHTLY",
   "INTERFACE64",
+
+  # On emulated architectures, RUNNER_ARCH makes manylinux-install-clang install a
+  # compiler for the native architecture, which will be much faster.
+  "RUNNER_ARCH",
 ]
 
 [tool.cibuildwheel.android]
