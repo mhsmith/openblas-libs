@@ -224,7 +224,7 @@ REM Copy CMake configuration files
 echo Copying CMake configuration files...
 if exist openblasconfig.cmake copy /Y openblasconfig.cmake "%DEST_DIR%\lib\cmake\openblas\"
 if exist openblasconfigversion.cmake copy /Y openblasconfigversion.cmake "%DEST_DIR%\lib\cmake\openblas\"
- 
+
 REM Copy header files
 echo Copying generated header files...
 if exist generated xcopy /E /Y generated "%DEST_DIR%\include\"
@@ -238,11 +238,9 @@ xcopy /Y "..\lapack-netlib\lapacke\include\*.h" "%DEST_DIR%\include\"
 if errorlevel 1 exit /b 1
 
 echo Create pkgconfig scipy-openblas.pc
-
-echo FIXME
-bash -c "find . -name *.pc | xargs ls -l"
-bash -c "find . -name *.pc | xargs cat"
-
+if not exist "%DEST_DIR%\lib\pkgconfig" mkdir "%DEST_DIR%\lib\pkgconfig"
+copy /Y openblas*.pc "%DEST_DIR%\lib\pkgconfig\scipy-openblas.pc"
+if errorlevel 1 exit /b 1
 cd ../..
 bash -e tools\get_pkg_config.sh
 if errorlevel 1 (

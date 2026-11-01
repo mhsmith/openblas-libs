@@ -96,14 +96,16 @@ def get_pkg_config(use_preloading=False, use_prefix=False):
     variables = {}
     with open(f"{get_lib_dir()}/pkgconfig/scipy-openblas.pc") as pc_file:
         for line in pc_file:
-            if match := re.fullmatch(r"(.+?)=(.*)", line.strip()):
+            # The CMake build used by Windows ARM64 produces a Version: keyword but not
+            # a version= variable, so parse both kinds of line.
+            if match := re.fullmatch(r"(.+?)[:=](.*)", line.strip()):
                 variables[match[1].strip()] = match[2].strip()
 
     return dedent(f"""\
         libdir={libdir}
         includedir={incdir}
         openblas_config= {variables["openblas_config"]}
-        version={variables["version"]}
+        version={variables.get("version") or variables["Version"]}
         extralib={extralib}
         Name: openblas
         Description: OpenBLAS is an optimized BLAS library based on GotoBLAS2 1.13 BSD version
